@@ -469,13 +469,30 @@ function sortByAsc(items) {
  *  'qwerty', 3 => 'qetwry' => 'qtrewy' => 'qrwtey'
  */
 function shuffleChar(str, iterations) {
-  let resStr = str;
+  const resStr = [...str];
+  const n = resStr.length;
   for (let i = 0; i < iterations; i += 1) {
-    for (let j = 1; j <= Math.trunc(resStr.length / 2); j += 1) {
-      resStr = resStr.substring(0, j) + resStr.substring(j + 1) + resStr[j];
+    const newArray = new Array(n);
+    let evenIndex = 0;
+    let oddIndex = Math.floor(n / 2);
+    for (let j = 0; j < n; j += 1) {
+      if (j % 2 === 0) {
+        newArray[evenIndex] = resStr[j];
+        evenIndex += 1;
+      } else {
+        newArray[oddIndex] = resStr[j];
+        oddIndex += 1;
+      }
+    }
+    for (let k = 0; k < n; k += 1) {
+      resStr[k] = newArray[k];
     }
   }
-  return resStr;
+  let result = '';
+  for (let i = 0; i < n; i += 1) {
+    result += resStr[i];
+  }
+  return result;
 }
 
 /**
@@ -495,8 +512,51 @@ function shuffleChar(str, iterations) {
  * @param {number} number The source number
  * @returns {number} The nearest larger number, or original number if none exists.
  */
-function getNearestBigger(/* number */) {
-  throw new Error('Not implemented');
+function getNearestBigger(number) {
+  const arr = [];
+  let num = number;
+  let res = 0;
+  while (num > 0) {
+    arr.unshift(num % 10);
+    num = Math.floor(num / 10);
+  }
+  let breakDigitIndex = arr.length - 1;
+  for (let i = arr.length - 1; i > 0; i -= 1) {
+    if (arr[i] > arr[i - 1]) {
+      breakDigitIndex = i - 1;
+      break;
+    }
+  }
+  let minGreaterIndex = breakDigitIndex + 1;
+  for (let i = breakDigitIndex + 1; i < arr.length; i += 1) {
+    if (arr[minGreaterIndex] > arr[i] && arr[i] > arr[breakDigitIndex]) {
+      minGreaterIndex = i;
+    }
+  }
+  const temporary = arr[breakDigitIndex];
+  arr[breakDigitIndex] = arr[minGreaterIndex];
+  arr[minGreaterIndex] = temporary;
+  let minIndex = breakDigitIndex + 1;
+  for (
+    let leftBorder = minIndex;
+    leftBorder < arr.length - 1;
+    leftBorder += 1
+  ) {
+    for (let j = leftBorder; j < arr.length; j += 1) {
+      if (arr[minIndex] > arr[j]) {
+        minIndex = j;
+      }
+    }
+    const temporary2 = arr[leftBorder];
+    arr[leftBorder] = arr[minIndex];
+    arr[minIndex] = temporary2;
+  }
+  let tensCounter = 1;
+  for (let i = arr.length - 1; i >= 0; i -= 1) {
+    res += arr[i] * tensCounter;
+    tensCounter *= 10;
+  }
+  return res;
 }
 
 module.exports = {
